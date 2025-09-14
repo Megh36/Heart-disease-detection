@@ -1,0 +1,37 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score,confusion_matrix,classification_report
+df=pd.read_csv("heart1.csv")
+df.head()
+df.info()
+df.isnull().sum
+df.describe()
+plt.figure(figsize=(10,8))
+sns.heatmap(df.corr(),annot=True,cmap="coolwarm")
+plt.show()
+x=df.drop("target",axis=1)
+y=df["target"]
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=42)
+scaler=StandardScaler()
+x_train=scaler.fit_transform(x_train)
+x_test=scaler.transform(x_test)
+log_model=LogisticRegression()
+log_model.fit(x_train,y_train)
+rf_model=RandomForestClassifier()
+rf_model.fit(x_train,y_train)
+log_pred=log_model.predict(x_test)
+rf_pred=rf_model.predict(x_test)
+print("Logistic regression accuracy:",accuracy_score(y_test,log_pred))
+print("random forest accuracy:",accuracy_score(y_test,rf_pred))
+print("classification report(random forst):\n",classification_report(y_test,rf_pred))
+cm=confusion_matrix(y_test,rf_pred)
+sns.heatmap(cm,annot=True,cmap="Blues")
+plt.xlabel("Predicted")
+plt.ylabel("actual")
+plt.show()
